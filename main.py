@@ -10,6 +10,8 @@ from botocore.exceptions import ClientError
 UPLOAD_FOLDER = 'media'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
+
+
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = "secret key"
@@ -27,31 +29,81 @@ with open('config.json') as json_file:
 
 @app.route('/')
 def index():
-    return render_template('index.html')
+    confg_data = {
+        'rds_endpoint': app.config['RDS_ENDPOINT'],'rds_user': app.config['RDS_USER'],
+        'rds_password': app.config['RDS_PASSWORD'],
+        's3_bucketname': app.config['S3_BUCKETNAME'], 's3_region':app.config['S3_REGION']
+    }
+    mydb = mysql.connector.connect(
+      host=app.config['RDS_ENDPOINT'],
+      user=app.config['RDS_USER'],
+      passwd=app.config['RDS_PASSWORD'],
+      database="awsdb"
+    )
+    cursor = mydb.cursor(dictionary=True)
+    qry = "SELECT * FROM `posts`"
+    cursor.execute(qry)
+    posts = cursor.fetchall()
+    cursor.close()
+    print(posts)
+    return render_template('index.html' ,data=confg_data,posts=posts)
 
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
+def parse_sql(filename):
+    data = open(filename, 'r').readlines()
+    stmts = []
+    DELIMITER = ';'
+    stmt = ''
 
+    for lineno, line in enumerate(data):
+        if not line.strip():
+            continue
+
+        if line.startswith('--'):
+            continue
+
+        if 'DELIMITER' in line:
+            DELIMITER = line.split()[1]
+            continue
+
+        if (DELIMITER not in line):
+            stmt += line.replace(DELIMITER, ';')
+            continue
+
+        if stmt:
+            stmt += line
+            stmts.append(stmt.strip())
+            stmt = ''
+        else:
+            stmts.append(line.strip())
+    return stmts
 @app.route('/config', methods=['GET', 'POST'])
 def config():
     if request.method == 'POST':
-        print(request.form)
+
         data = request.form.to_dict()
-        print(data)
+
         app.config['RDS_ENDPOINT'] = data['rds-endpoint'] if "rds-endpoint" in data else ""
         app.config['RDS_USER'] = data['rds-user'] if "rds-user" in data else ""
         app.config['RDS_PASSWORD'] = data['rds-password'] if "rds-password" in data else ""
         app.config['S3_BUCKETNAME'] = data['s3-bucketname'] if "s3-bucketname" in data else ""
         app.config['S3_REGION'] = data['s3-region'] if "s3-region" in data else ""
-        print(app.config)
+
         try :
             mydb = mysql.connector.connect(
               host=app.config['RDS_ENDPOINT'],
               user=app.config['RDS_USER'],
               passwd=app.config['RDS_PASSWORD']
             )
+            mydb.autocommit = True
+            cursor = mydb.cursor()
+            stmts = parse_sql('awsdb.sql')
+            for stmt in stmts:
+                cursor.execute(stmt)
+            cursor.close()
 
         except Exception as e:
             print(e)
@@ -60,17 +112,7 @@ def config():
         with open('config.json', 'w') as outfile:
             json.dump(data, outfile)
 
-        try:
-            if app.config['S3_REGION'] is None:
-                s3_client = boto3.client('s3')
-                s3_client.create_bucket(Bucket=app.config['S3_BUCKETNAME'])
-            else:
-                s3_client = boto3.client('s3', region_name=app.config['S3_REGION'])
-                location = {'LocationConstraint': app.config['S3_REGION']}
-                s3_client.create_bucket(Bucket=app.config['S3_BUCKETNAME'],
-                                        CreateBucketConfiguration=location)
-        except Exception as e:
-            print(e)
+
 
     return redirect("/")
 
@@ -78,21 +120,49 @@ def config():
 @app.route('/post', methods=['GET', 'POST'])
 def upload_file():
     if request.method == 'POST':
-        print(request.files)
-        print(request.form)
+
         # check if the post request has the file part
         if 'file' not in request.files:
             #flash('No file part')
             return redirect("/")
         file = request.files['file']
-        # if user does not select file, browser also
-        # submit an empty part without filename
+
+        session = boto3.Session(
+                region_name=app.config['S3_REGION']
+            )
+        s3 = session.resource('s3')
+        bucket = s3.Bucket(app.config['S3_BUCKETNAME'])
+
+
+
+
+
+
         if file.filename == '':
             flash('No selected file')
             return redirect("/")
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            url = "https://s3-%s.amazonaws.com/%s/%s" % (app.config['S3_REGION'], app.config['S3_BUCKETNAME'], file.filename)
+            bucket.put_object(Body=file,
+                          Key=file.filename,
+                          ACL='public-read',
+                          ContentType=file.content_type)
+            data = request.form.to_dict()
+            qry = "INSERT INTO `posts` (`title`, `quote`, `image_url`) VALUES ('{}', '{}', '{}')".format(data['title'],data['quote'],url)
+
+            mydb = mysql.connector.connect(
+              host=app.config['RDS_ENDPOINT'],
+              user=app.config['RDS_USER'],
+              passwd=app.config['RDS_PASSWORD'],
+              database="awsdb"
+            )
+            mydb.autocommit = True
+            cursor = mydb.cursor()
+            cursor.execute(qry)
+            qry = "SELECT * FROM `posts`"
+            cursor.execute(qry)
+            print(cursor.fetchall())
+            cursor.close()
             return redirect("/")
 
 

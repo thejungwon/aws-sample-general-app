@@ -42,16 +42,18 @@
       <section>
         <h4 class="header">믿고 보는 맛집 리스트</h4>
         <div class="row">
+          {% for post in posts %}
           <div class="col s12 m4">
             <div class="card modal-trigger" data-target="modal1">
-              <div class="card-image" style="background-image:url({{ url_for('static', filename='sample-food.jpg') }})">
+              <div class="card-image" style="background-image:url({{post.image_url}})">
                 <div class="card-centered-content">
-                  <div class="title">샘플 텍스트</div>
-                  <div class="sub-title">&#8220;샘플 설명&#8221;</div>
+                  <div class="title">{{post.title}}</div>
+                  <div class="sub-title">&#8220;{{post.quote}}&#8221;</div>
                 </div>
               </div>
             </div>
           </div>
+          {% endfor %}
         </div>
       </section>
       </div>
@@ -68,24 +70,24 @@
           <form class="col s12" id="config" method="post" action="/config">
             <div class="row">
               <div class="input-field col s12">
-                <input placeholder="Placeholder" type="text" class="validate" name="rds-endpoint">
+                <input placeholder="Placeholder" type="text" class="validate" name="rds-endpoint" value="{{data.rds_endpoint}}">
                 <label for="first_name">RDS Endpoint</label>
               </div>
               <div class="input-field col s6">
-                <input placeholder="Placeholder" type="text" class="validate" name="rds-user">
+                <input placeholder="Placeholder" type="text" class="validate" name="rds-user" value="{{data.rds_user}}">
                 <label for="first_name">RDS user</label>
               </div>
               <div class="input-field col s6">
-                <input placeholder="Placeholder" type="password" class="validate" name="rds-password">
+                <input placeholder="Placeholder" type="password" class="validate" name="rds-password" value="{{data.rds_password}}">
                 <label for="first_name">RDS password</label>
               </div>
 
               <div class="input-field col s6">
-                <input placeholder="Placeholder" type="text" class="validate" name="s3-bucketname">
+                <input placeholder="Placeholder" type="text" class="validate" name="s3-bucketname" value="{{data.s3_bucketname}}">
                 <label for="last_name">S3 bucket name</label>
               </div>
               <div class="input-field col s6">
-                <input placeholder="Placeholder" type="text" class="validate" name="s3-region">
+                <input placeholder="Placeholder" type="text" class="validate" name="s3-region" value="{{data.s3_region}}">
                 <label for="last_name">S3 region</label>
               </div>
             </div>
