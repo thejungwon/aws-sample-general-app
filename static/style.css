@@ -1,0 +1,63 @@
+.banner{
+  position:relative;
+  height:500px;
+  width:100%;
+  background-size:     cover;
+  background-repeat:   no-repeat;
+  background-position: center center;
+}
+
+.overlay{
+  position:absolute;
+  top:0;
+  width:100%;
+  height:100%;
+  background-color: rgba(0,0,0,0.3);
+
+}
+.inner-content{
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  margin: auto;
+  align-items: center;
+  display: flex;
+}
+.inner-content > h3{
+    color:white;
+    width:100%;
+    text-align:center;
+}
+.card-title{
+  text-shadow: 6px 6px 16px rgba(0,0,0,0.9);
+  font-weight:600 !important;
+}
+.card-image{
+  height:200px;
+  background-size:     cover;
+  background-repeat:   no-repeat;
+  background-position: center center;
+}
+.card-centered-content{
+  height:100%;
+  text-align: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction:column;
+  color:white;
+}
+.card-centered-content .title{
+  font-size:34px;
+  text-shadow: 6px 6px 16px rgba(0,0,0,0.9);
+}
+.card-centered-content .sub-title{
+  font-size:20px;
+  text-shadow: 6px 6px 16px rgba(0,0,0,0.9);
+}
+.modal-trigger{
+  cursor:pointer;
+}

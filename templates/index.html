@@ -1,0 +1,128 @@
+<!doctype html>
+<html>
+  <head>
+
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <!-- Compiled and minified CSS -->
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+
+   <!-- Compiled and minified JavaScript -->
+   <script
+  src="https://code.jquery.com/jquery-3.4.1.js"
+  integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU="
+  crossorigin="anonymous"></script>
+
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+
+    <title>AWS 플레이트</title>
+    <style type="text/css">
+
+    </style>
+  </head>
+  <body>
+    <nav>
+      <div class="container">
+        <div class="nav-wrapper">
+          <a href="#" class="brand-logo">AWS 플레이트</a>
+          <ul id="nav-mobile" class="right hide-on-med-and-down">
+            <li><a class="modal-trigger" href="#admin">Admin</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+    <main>
+      <div class="banner" style="background-image:url({{ url_for('static', filename='parallax1.jpg') }})">
+        <div class="inner-content">
+          <h3>솔직한 리뷰, 믿을 수 있는 평점<br>AWS 플레이트</h3>
+        </div>
+        <div class="overlay"></div>
+      </div>
+      <div class="container">
+      <section>
+        <h4 class="header">믿고 보는 맛집 리스트</h4>
+        <div class="row">
+          <div class="col s12 m4">
+            <div class="card modal-trigger" data-target="modal1">
+              <div class="card-image" style="background-image:url({{ url_for('static', filename='sample-food.jpg') }})">
+                <div class="card-centered-content">
+                  <div class="title">샘플 텍스트</div>
+                  <div class="sub-title">&#8220;샘플 설명&#8221;</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      </div>
+
+
+
+    </main>
+    <!-- Modal Structure -->
+    <div id="admin" class="modal">
+      <div class="modal-content">
+        <h4>Modal Header</h4>
+        <p>A bunch of text</p>
+        <div class="row">
+          <form class="col s12" id="config">
+            <div class="row">
+              <div class="input-field col s12">
+                <input placeholder="Placeholder" type="text" class="validate" name="rds-endpoint">
+                <label for="first_name">RDS Endpoint</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="Placeholder" type="text" class="validate" name="s3-endpoint">
+                <label for="last_name">S3 Endpoint</label>
+              </div>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">닫기</a>
+        <a href="#!" class="submit-btn waves-effect waves-green btn-flat">설정 저장</a>
+      </div>
+    </div>
+    <footer>
+
+      <div class="container">
+        <div class="row">
+          <div class="col l6 s12">
+            <h5 class="white-text">Footer Content</h5>
+            <p class="grey-text text-lighten-4">You can use rows and columns here to organize your footer content.</p>
+          </div>
+          <div class="col l4 offset-l2 s12">
+            <h5 class="white-text">Links</h5>
+            <ul>
+              <li><a class="grey-text text-lighten-3" href="#!">Link 1</a></li>
+              <li><a class="grey-text text-lighten-3" href="#!">Link 2</a></li>
+              <li><a class="grey-text text-lighten-3" href="#!">Link 3</a></li>
+              <li><a class="grey-text text-lighten-3" href="#!">Link 4</a></li>
+            </ul>
+          </div>
+        </div>
+      </div>
+      <div class="footer-copyright">
+        <div class="container">
+        © 2019 Copyright Text
+        <a class="grey-text text-lighten-4 right" href="#!">More Links</a>
+        </div>
+      </div>
+    </footer>
+    <script>
+      $(document).ready(function(){
+        $('.modal').modal();
+
+        $('.submit-btn').click(function(){
+          var data = $('#config').serializeArray();
+          var indexed_array = {};
+
+          $.map(data, function(n, i){
+              indexed_array[n['name']] = n['value'];
+          });
+          console.log(indexed_array);
+        });
+     });
+    </script>
+  </body>
+</html>
