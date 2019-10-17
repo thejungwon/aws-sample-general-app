@@ -26,6 +26,7 @@
           <a href="#" class="brand-logo">AWS 플레이트</a>
           <ul id="nav-mobile" class="right hide-on-med-and-down">
             <li><a class="modal-trigger" href="#admin">Admin</a></li>
+            <li><a class="modal-trigger" href="#place">맛집추가</a></li>
           </ul>
         </div>
       </div>
@@ -64,15 +65,28 @@
         <h4>Modal Header</h4>
         <p>A bunch of text</p>
         <div class="row">
-          <form class="col s12" id="config">
+          <form class="col s12" id="config" method="post" action="/config">
             <div class="row">
               <div class="input-field col s12">
                 <input placeholder="Placeholder" type="text" class="validate" name="rds-endpoint">
                 <label for="first_name">RDS Endpoint</label>
               </div>
-              <div class="input-field col s12">
-                <input placeholder="Placeholder" type="text" class="validate" name="s3-endpoint">
-                <label for="last_name">S3 Endpoint</label>
+              <div class="input-field col s6">
+                <input placeholder="Placeholder" type="text" class="validate" name="rds-user">
+                <label for="first_name">RDS user</label>
+              </div>
+              <div class="input-field col s6">
+                <input placeholder="Placeholder" type="password" class="validate" name="rds-password">
+                <label for="first_name">RDS password</label>
+              </div>
+
+              <div class="input-field col s6">
+                <input placeholder="Placeholder" type="text" class="validate" name="s3-bucketname">
+                <label for="last_name">S3 bucket name</label>
+              </div>
+              <div class="input-field col s6">
+                <input placeholder="Placeholder" type="text" class="validate" name="s3-region">
+                <label for="last_name">S3 region</label>
               </div>
             </div>
           </form>
@@ -81,6 +95,42 @@
       <div class="modal-footer">
         <a href="#!" class="modal-close waves-effect waves-green btn-flat">닫기</a>
         <a href="#!" class="submit-btn waves-effect waves-green btn-flat">설정 저장</a>
+      </div>
+    </div>
+
+    <div id="place" class="modal">
+      <div class="modal-content">
+        <h4>Modal Header</h4>
+        <p>A bunch of text</p>
+        <div class="row">
+          <form class="col s12" id="posting" method="post" action="/post" enctype="multipart/form-data">
+            <div class="row">
+              <div class="input-field col s12">
+                <input placeholder="홍대 맛집" type="text" class="validate" name="title">
+                <label for="first_name">Title</label>
+              </div>
+              <div class="input-field col s12">
+                <input placeholder="최고의 맛집!" type="text" class="validate" name="quote">
+                <label for="last_name">Quote</label>
+              </div>
+
+              <div class="file-field input-field col s12">
+                <div class="btn">
+                  <span>사진</span>
+                  <input type="file" name="file">
+                </div>
+                <div class="file-path-wrapper">
+                  <input class="file-path validate" type="text">
+                </div>
+              </div>
+              <input type="submit"/>
+            </div>
+          </form>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <a href="#!" class="modal-close waves-effect waves-green btn-flat">닫기</a>
+        <a href="#!" class="form-submit-btn waves-effect waves-green btn-flat">설정 저장</a>
       </div>
     </div>
     <footer>
@@ -114,13 +164,11 @@
         $('.modal').modal();
 
         $('.submit-btn').click(function(){
-          var data = $('#config').serializeArray();
-          var indexed_array = {};
+         $('#config').submit();
+        });
 
-          $.map(data, function(n, i){
-              indexed_array[n['name']] = n['value'];
-          });
-          console.log(indexed_array);
+        $('.form-submit-btn').click(function(){
+           $('#posting').submit();
         });
      });
     </script>
