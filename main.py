@@ -118,7 +118,7 @@ def config():
         with open('config.json', 'w') as outfile:
             json.dump(data, outfile)
 
-        with open('config.json', 'r') as file:
+        with open('config.json', 'rb') as file:
             session = boto3.Session(
                     region_name=app.config['S3_REGION']
                 )
