@@ -16,6 +16,7 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.secret_key = "secret key"
 
+
 with open('config.json') as json_file:
     data = json.load(json_file)
     app.config['RDS_ENDPOINT'] = data['rds-endpoint'] if "rds-endpoint" in data else ""
@@ -23,7 +24,8 @@ with open('config.json') as json_file:
     app.config['RDS_PASSWORD'] = data['rds-password'] if "rds-password" in data else ""
     app.config['S3_BUCKETNAME'] = data['s3-bucketname'] if "s3-bucketname" in data else ""
     app.config['S3_REGION'] = data['s3-region'] if "s3-region" in data else ""
-    print(app.config)
+
+
 
 
 
@@ -34,18 +36,22 @@ def index():
         'rds_password': app.config['RDS_PASSWORD'],
         's3_bucketname': app.config['S3_BUCKETNAME'], 's3_region':app.config['S3_REGION']
     }
-    mydb = mysql.connector.connect(
-      host=app.config['RDS_ENDPOINT'],
-      user=app.config['RDS_USER'],
-      passwd=app.config['RDS_PASSWORD'],
-      database="awsdb"
-    )
-    cursor = mydb.cursor(dictionary=True)
-    qry = "SELECT * FROM `posts`"
-    cursor.execute(qry)
-    posts = cursor.fetchall()
-    cursor.close()
-    print(posts)
+    posts=[]
+    try :
+        mydb = mysql.connector.connect(
+          host=app.config['RDS_ENDPOINT'],
+          user=app.config['RDS_USER'],
+          passwd=app.config['RDS_PASSWORD'],
+          database="awsdb"
+        )
+        cursor = mydb.cursor(dictionary=True)
+        qry = "SELECT * FROM `posts`"
+        cursor.execute(qry)
+        posts = cursor.fetchall()
+        cursor.close()
+    except Exception as e:
+        print(e)
+
     return render_template('index.html' ,data=confg_data,posts=posts)
 
 def allowed_file(filename):
@@ -112,6 +118,15 @@ def config():
         with open('config.json', 'w') as outfile:
             json.dump(data, outfile)
 
+        with open('config.json', 'r') as file:
+            session = boto3.Session(
+                    region_name=app.config['S3_REGION']
+                )
+            s3 = session.resource('s3')
+            bucket = s3.Bucket(app.config['S3_BUCKETNAME'])
+            bucket.put_object(Body=file,
+                          Key="config.json",
+                          ACL='authenticated-read')
 
 
     return redirect("/")

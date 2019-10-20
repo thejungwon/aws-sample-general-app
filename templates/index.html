@@ -125,7 +125,7 @@
                   <input class="file-path validate" type="text">
                 </div>
               </div>
-              <input type="submit"/>
+
             </div>
           </form>
         </div>
@@ -166,11 +166,29 @@
         $('.modal').modal();
 
         $('.submit-btn').click(function(){
+          var config_data = $('#config').serializeArray();
+          for (var data of config_data){
+            console.log(data.value);
+            if (!data.value){
+              alert("RDS와 S3설정을 다시 확인해주세요!");
+              return;
+            }
+          }
          $('#config').submit();
+
         });
 
         $('.form-submit-btn').click(function(){
-           $('#posting').submit();
+          console.log($('#config').serializeArray());
+          var config_data = $('#config').serializeArray();
+          for (var data of config_data){
+            console.log(data.value);
+            if (!data.value){
+              alert("RDS와 S3설정을 다시 확인해주세요!");
+              return;
+            }
+          }
+          $('#posting').submit();
         });
      });
     </script>
