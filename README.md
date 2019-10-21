@@ -23,6 +23,7 @@ python main.py
 6. Submit the RDS and S3 information on the website that we launched.
 7. Check if posting function works.
 8. Launch another EC2 instance with the following command (mind the bucket name).
+ - You have to attach the IAM role this time while you are creating the instance.
 ```
 #!/bin/bash
 sudo apt-get update
