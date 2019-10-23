@@ -157,9 +157,10 @@ def upload_file():
             flash('No selected file')
             return redirect("/")
         if file and allowed_file(file.filename):
-            url = "https://s3.%s.amazonaws.com/%s/%s" % (app.config['S3_REGION'], app.config['S3_BUCKETNAME'], file.filename)
+            filename = file.filename.replace(" ", "")
+            url = "https://s3.%s.amazonaws.com/%s/%s" % (app.config['S3_REGION'], app.config['S3_BUCKETNAME'], filename)
             bucket.put_object(Body=file,
-                          Key=file.filename,
+                          Key=filename,
                           ACL='public-read',
                           ContentType=file.content_type)
             data = request.form.to_dict()
