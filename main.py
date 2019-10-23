@@ -157,7 +157,7 @@ def upload_file():
             flash('No selected file')
             return redirect("/")
         if file and allowed_file(file.filename):
-            url = "https://s3-%s.amazonaws.com/%s/%s" % (app.config['S3_REGION'], app.config['S3_BUCKETNAME'], file.filename)
+            url = "https://s3.%s.amazonaws.com/%s/%s" % (app.config['S3_REGION'], app.config['S3_BUCKETNAME'], file.filename)
             bucket.put_object(Body=file,
                           Key=file.filename,
                           ACL='public-read',
