@@ -36,7 +36,7 @@ virtualenv venv
 . venv/bin/activate
 pip3 install -r requirements.txt
 sudo apt-get  install awscli -y
-aws s3 cp s3://[YOUR_RDS_BUCKET_NAME]/config.json config.json
+aws s3 cp s3://[YOUR_S3_BUCKET_NAME]/config.json config.json
 sed -i "s?AWS 플레이트?AWS 플레이트2?" templates/index.html
 python main.py
 ```
