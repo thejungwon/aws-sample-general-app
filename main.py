@@ -51,7 +51,7 @@ def index():
         cursor.close()
     except Exception as e:
         print(e)
-    
+
     try :
         service_info=requests.get("http://169.254.169.254/latest/meta-data/ami-id",timeout=3).text
     except:
@@ -146,11 +146,8 @@ def upload_file():
             return redirect("/")
         file = request.files['file']
 
-        session = boto3.Session(
-                region_name=app.config['S3_REGION']
-            )
-        s3 = session.resource('s3')
-        bucket = s3.Bucket(app.config['S3_BUCKETNAME'])
+        client = boto3.client('s3')
+
 
 
 
@@ -163,10 +160,12 @@ def upload_file():
         if file and allowed_file(file.filename):
             filename = file.filename.replace(" ", "")
             url = "https://s3.%s.amazonaws.com/%s/%s" % (app.config['S3_REGION'], app.config['S3_BUCKETNAME'], filename)
-            bucket.put_object(Body=file,
+            client.put_object(Body=file,
                           Key=filename,
+                          Bucket=app.config['S3_BUCKETNAME'],
                           ACL='public-read',
                           ContentType=file.content_type)
+
             data = request.form.to_dict()
             qry = "INSERT INTO `posts` (`title`, `quote`, `image_url`) VALUES ('{}', '{}', '{}')".format(data['title'],data['quote'],url)
 
