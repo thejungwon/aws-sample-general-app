@@ -53,7 +53,7 @@ def index():
         print(e)
 
     try :
-        service_info=requests.get("http://169.254.169.254/latest/meta-data/ami-id",timeout=3).text
+        service_info=requests.get("http://169.254.169.254/latest/meta-data/instance-id",timeout=2).text
     except:
         service_info =""
 
