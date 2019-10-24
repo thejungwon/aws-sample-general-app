@@ -6,7 +6,7 @@ import json
 import mysql.connector
 import boto3
 from botocore.exceptions import ClientError
-
+import requests
 UPLOAD_FOLDER = 'media'
 ALLOWED_EXTENSIONS = set(['png', 'jpg', 'jpeg', 'gif'])
 
@@ -51,8 +51,8 @@ def index():
         cursor.close()
     except Exception as e:
         print(e)
-
-    return render_template('index.html' ,data=confg_data,posts=posts)
+    service_info=requests.get("http://169.254.169.254/latest/meta-data/ami-id").text
+    return render_template('index.html' ,data=confg_data,posts=posts, service_info=service_info)
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -111,25 +111,24 @@ def config():
                 cursor.execute(stmt)
             cursor.close()
 
-        except Exception as e:
-            print(e)
-            #return redirect("/")
+        except :
+            return "<script>alert('RDS 설정을 다시 확인해주세요!');location.href='/';</script>"
 
         with open('config.json', 'w') as outfile:
             json.dump(data, outfile)
 
         with open('config.json', 'rb') as file:
-            session = boto3.Session(
-                    region_name=app.config['S3_REGION']
-                )
-            s3 = session.resource('s3')
-            bucket = s3.Bucket(app.config['S3_BUCKETNAME'])
-            bucket.put_object(Body=file,
-                          Key="config.json",
-                          ACL='authenticated-read')
+            try:
+                client = boto3.client('s3')
+                client.put_object(Body=file,
+                            Bucket=app.config['S3_BUCKETNAME'],
+                            Key="config.json",
+                            ACL='authenticated-read')
+            except :
+                return "<script>alert('S3 설정을 다시 확인해주세요!');location.href='/';</script>"
 
 
-    return redirect("/")
+    return return "<script>alert('설정완료!');location.href='/';</script>"
 
 
 @app.route('/post', methods=['GET', 'POST'])
