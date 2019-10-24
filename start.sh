@@ -8,6 +8,6 @@ cd aws-sample-general-app
 virtualenv venv
 . venv/bin/activate
 pip3 install -r requirements.txt
-cp main.service /etc/systemd
+cp main.service /etc/systemd/system/
 systemctl start main
 systemctl enable main
