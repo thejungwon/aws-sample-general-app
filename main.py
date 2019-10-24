@@ -51,7 +51,12 @@ def index():
         cursor.close()
     except Exception as e:
         print(e)
-    service_info=requests.get("http://169.254.169.254/latest/meta-data/ami-id").text
+    
+    try :
+        service_info=requests.get("http://169.254.169.254/latest/meta-data/ami-id",timeout=3).text
+    except:
+        service_info =""
+
     return render_template('index.html' ,data=confg_data,posts=posts, service_info=service_info)
 
 def allowed_file(filename):
@@ -128,7 +133,7 @@ def config():
                 return "<script>alert('S3 설정을 다시 확인해주세요!');location.href='/';</script>"
 
 
-    return return "<script>alert('설정완료!');location.href='/';</script>"
+    return  "<script>alert('설정완료!');location.href='/';</script>"
 
 
 @app.route('/post', methods=['GET', 'POST'])
